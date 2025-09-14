@@ -44,7 +44,7 @@ class VectorStore:
     def store_documents(self, documents: List[Tuple[str, str, List[float]]]):
         """
         Store documents with their embeddings in the vector database.
-        Each tuple contains: (content, source_url, embedding)
+        Each tuple contains: (markdown_content, source_url, embedding)
         """
         if not documents:
             logger.warning("No documents to store")
@@ -56,7 +56,17 @@ class VectorStore:
         try:
             # For newer versions of langchain-postgres, we need to use add_embeddings directly
             texts = [content for content, _, _ in documents]
-            metadatas = [{"source": source_url} for _, source_url, _ in documents]
+            # Create metadata matching the structure used for images
+            metadatas = [
+                {
+                    "id": "",  # Will be populated by the database
+                    "url": source_url,  # The URL of the chunk
+                    "text": content,  # The Markdown content of the chunk
+                    "source": source_url,  # The source (URL) - for consistency with image structure
+                    "mimetype": "text/markdown"  # MIME type for Markdown content
+                } 
+                for content, source_url, _ in documents
+            ]
             embeddings = [emb for _, _, emb in documents]
             
             # Store documents with their embeddings

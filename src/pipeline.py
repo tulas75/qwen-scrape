@@ -73,7 +73,7 @@ class RAGPipeline:
     def _chunk_scraped_data(self, scraped_data: List[Tuple[str, str]]) -> List[Tuple[str, str]]:
         """
         Chunk scraped data.
-        Returns list of (chunk_content, source_url) tuples.
+        Returns list of (markdown_chunk_content, source_url) tuples.
         """
         chunked_data = []
         for i, (content, url) in enumerate(scraped_data):
@@ -91,7 +91,7 @@ class RAGPipeline:
     def _generate_embeddings(self, chunked_data: List[Tuple[str, str]]) -> List[Tuple[str, str, List[float]]]:
         """
         Generate embeddings for chunked data.
-        Returns list of (chunk_content, source_url, embedding) tuples.
+        Returns list of (markdown_chunk_content, source_url, embedding) tuples.
         """
         if not chunked_data:
             return []

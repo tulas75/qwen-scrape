@@ -4,7 +4,7 @@ A web scraping pipeline that extracts content from websites, processes it for LL
 
 ## Features
 - Configurable web scraping with depth and page limits
-- HTML to text transformation
+- HTML to Markdown transformation
 - Content chunking with overlap
 - Vector embeddings generation using intfloat/multilingual-e5-large-instruct
 - PostgreSQL/pgvector storage with langchain_postgres and psycopg3
@@ -51,6 +51,8 @@ A web scraping pipeline that extracts content from websites, processes it for LL
    ```bash
    pip install -r requirements.txt
    ```
+   
+   This will install all required packages including `markdownify` for HTML to Markdown conversion.
 
 ## Configuration
 

@@ -5,6 +5,7 @@ from typing import Set, List, Tuple
 import logging
 import random
 import time
+from markdownify import markdownify as md  # Add markdownify import
 from src.config.settings import config
 
 logger = logging.getLogger(__name__)
@@ -69,23 +70,13 @@ class WebScraper:
             return False
 
     def extract_text_from_html(self, html_content: str) -> str:
-        """Extract text content from HTML."""
+        """Convert HTML content to Markdown."""
         try:
-            soup = BeautifulSoup(html_content, "html.parser")
-            
-            # Remove script and style elements
-            for script in soup(["script", "style"]):
-                script.decompose()
-                
-            # Get text and clean it up
-            text = soup.get_text()
-            lines = (line.strip() for line in text.splitlines())
-            chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-            text = ' '.join(chunk for chunk in chunks if chunk)
-            
-            return text
+            # Convert HTML to Markdown
+            markdown_content = md(html_content, heading_style="ATX")
+            return markdown_content
         except Exception as e:
-            logger.error(f"Error extracting text from HTML: {str(e)}")
+            logger.error(f"Error converting HTML to Markdown: {str(e)}")
             return ""
 
     def get_page_content(self, url: str) -> Tuple[str, str]:
