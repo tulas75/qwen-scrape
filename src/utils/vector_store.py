@@ -1,11 +1,23 @@
 from langchain_postgres import PGVector
-from langchain_postgres.vectorstores import PGVectorStore
 from langchain_core.documents import Document
+from langchain_core.embeddings import Embeddings
 from typing import List, Tuple
 import logging
 from src.config.settings import config
 
 logger = logging.getLogger(__name__)
+
+
+class DummyEmbeddings(Embeddings):
+    """A dummy embeddings class that satisfies the interface but isn't actually used."""
+    
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        """Return dummy embeddings."""
+        return [[0.0] * 1536 for _ in texts]  # Return dummy embeddings with 1536 dimensions
+    
+    def embed_query(self, text: str) -> List[float]:
+        """Return a dummy embedding."""
+        return [0.0] * 1536  # Return dummy embedding with 1536 dimensions
 
 
 class VectorStore:
@@ -17,8 +29,11 @@ class VectorStore:
     def _initialize_store(self):
         """Initialize the PGVector store."""
         try:
+            # Use a dummy embeddings object to satisfy the interface
+            # We'll provide embeddings manually when adding documents
+            dummy_embeddings = DummyEmbeddings()
             self.vector_store = PGVector(
-                embeddings=None,  # We'll provide embeddings manually
+                embeddings=dummy_embeddings,
                 connection=self.connection_string,
                 collection_name="web_scraping_collection",
             )
@@ -39,17 +54,17 @@ class VectorStore:
             self._initialize_store()
             
         try:
-            # Convert to Langchain Document format
-            langchain_docs = [
-                Document(
-                    page_content=content,
-                    metadata={"source": source_url}
-                )
-                for content, source_url, _ in documents
-            ]
+            # For newer versions of langchain-postgres, we need to use add_embeddings directly
+            texts = [content for content, _, _ in documents]
+            metadatas = [{"source": source_url} for _, source_url, _ in documents]
+            embeddings = [emb for _, _, emb in documents]
             
             # Store documents with their embeddings
-            self.vector_store.add_documents(langchain_docs, embeddings=[emb for _, _, emb in documents])
+            self.vector_store.add_embeddings(
+                texts=texts,
+                embeddings=embeddings,
+                metadatas=metadatas
+            )
             logger.info(f"Stored {len(documents)} documents in vector store")
         except Exception as e:
             logger.error(f"Failed to store documents: {str(e)}")

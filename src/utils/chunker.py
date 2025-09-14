@@ -40,8 +40,8 @@ class TextChunker:
             # Move start position for next chunk (with overlap)
             start = end - self.chunk_overlap
             
-            # If overlap is too large or we've reached the end, break
-            if start >= len(text) or start <= 0:
+            # If we've reached the end or the next chunk would be smaller than the overlap, break
+            if end >= len(text) or start >= len(text):
                 break
                 
         logger.info(f"Created {len(chunks)} chunks from text of length {len(text)}")
