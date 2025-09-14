@@ -27,7 +27,7 @@ class RAGPipeline:
         self.embedder = EmbeddingGenerator()
         self.vector_store = VectorStore(collection_name=collection_name)
 
-    def run(self, start_url: str, max_depth: int = None, page_limit: int = None, use_sitemap: bool = False) -> None:
+    def run(self, start_url: str, max_depth: int = None, page_limit: int = None, use_sitemap: bool = False, batch_size: int = None) -> None:
         """
         Run the complete RAG pipeline.
         
@@ -36,7 +36,11 @@ class RAGPipeline:
             max_depth: Maximum depth to crawl
             page_limit: Maximum number of pages to scrape
             use_sitemap: Whether to use sitemap.xml for URL discovery
+            batch_size: Number of chunks to process in each batch (defaults to config.batch_size)
         """
+        # Use batch size from config if not provided
+        if batch_size is None:
+            batch_size = config.batch_size
         try:
             # Update scraper settings if provided
             if max_depth is not None:
@@ -66,14 +70,9 @@ class RAGPipeline:
                 logger.warning("No chunks created. Exiting pipeline.")
                 return
             
-            # 3. Generate embeddings
-            logger.info("Generating embeddings")
-            embedded_data = self._generate_embeddings(chunked_data)
-            logger.info("Embeddings generated successfully")
-            
-            # 4. Store in vector database
-            logger.info("Storing in vector database")
-            self.vector_store.store_documents(embedded_data)
+            # 3. Generate embeddings and store in batches
+            logger.info(f"Generating embeddings and storing in batches of {batch_size}")
+            self._process_embeddings_in_batches(chunked_data, batch_size)
             logger.info("Pipeline completed successfully")
             
         except Exception as e:
@@ -130,6 +129,37 @@ class RAGPipeline:
         
         return embedded_data
 
+    def _process_embeddings_in_batches(self, chunked_data: List[Tuple[str, str]], batch_size: int = 100) -> None:
+        """
+        Process and store embeddings in batches to manage memory usage.
+        
+        Args:
+            chunked_data: List of (markdown_chunk_content, source_url) tuples
+            batch_size: Number of chunks to process in each batch
+        """
+        total_chunks = len(chunked_data)
+        logger.info(f"Processing {total_chunks} chunks in batches of {batch_size}")
+        
+        # Process in batches
+        for i in range(0, total_chunks, batch_size):
+            batch = chunked_data[i:i + batch_size]
+            batch_num = (i // batch_size) + 1
+            total_batches = (total_chunks + batch_size - 1) // batch_size
+            
+            logger.info(f"Processing batch {batch_num}/{total_batches} ({len(batch)} chunks)")
+            
+            try:
+                # Generate embeddings for this batch
+                embedded_batch = self._generate_embeddings(batch)
+                
+                # Store in vector database
+                self.vector_store.store_documents(embedded_batch)
+                logger.info(f"Stored batch {batch_num}/{total_batches} successfully")
+                
+            except Exception as e:
+                logger.error(f"Error processing batch {batch_num}: {str(e)}")
+                raise
+
 
 def main():
     parser = argparse.ArgumentParser(description="Web Scraper for RAG")
@@ -143,6 +173,8 @@ def main():
                         help="Use sitemap.xml for URL discovery instead of traditional crawling")
     parser.add_argument("--collection-name", type=str, default="web_scraping_collection",
                         help="Name of the collection in the vector store")
+    parser.add_argument("--batch-size", type=int, default=None,
+                        help="Batch size for processing embeddings (default: from config)")
     
     args = parser.parse_args()
     
@@ -151,9 +183,11 @@ def main():
         parser.error("Depth must be non-negative")
     if args.page_limit <= 0:
         parser.error("Page limit must be positive")
+    if args.batch_size is not None and args.batch_size <= 0:
+        parser.error("Batch size must be positive")
     
     pipeline = RAGPipeline(chunking_strategy=args.chunking_strategy, collection_name=args.collection_name)
-    pipeline.run(args.url, args.depth, args.page_limit, args.use_sitemap)
+    pipeline.run(args.url, args.depth, args.page_limit, args.use_sitemap, args.batch_size)
 
 
 if __name__ == "__main__":

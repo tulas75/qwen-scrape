@@ -38,6 +38,10 @@ def main():
     pipeline_sitemap = RAGPipeline(chunking_strategy="paragraph")
     # pipeline_sitemap.run(start_url, max_depth, page_limit, use_sitemap=True)
     
+    print("\n5. Running with custom batch size for large datasets:")
+    pipeline_batched = RAGPipeline(chunking_strategy="paragraph")
+    # pipeline_batched.run(start_url, max_depth, page_limit, batch_size=50)
+    
     print("\nPipeline execution completed!")
 
 if __name__ == "__main__":

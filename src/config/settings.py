@@ -22,6 +22,7 @@ class Config:
     # Processing settings
     chunk_size: int = int(os.getenv("CHUNK_SIZE", "250"))
     chunk_overlap: int = int(os.getenv("CHUNK_OVERLAP", "10"))
+    batch_size: int = int(os.getenv("BATCH_SIZE", "100"))
 
 
 # Global config instance
