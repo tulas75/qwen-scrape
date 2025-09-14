@@ -15,6 +15,7 @@ A web scraping pipeline that extracts content from websites, processes it for LL
 - Vector embeddings generation using intfloat/multilingual-e5-large-instruct
 - PostgreSQL/pgvector storage with langchain_postgres and psycopg3
 - Batch processing of embeddings for memory efficiency with large datasets
+- Automatic database connection handling with reconnection for long-running jobs
 
 ## Requirements
 - Python 3.8+
@@ -232,3 +233,4 @@ python -m tests.test_batch_processing
 3. The pipeline will create a collection in your database. By default, it uses "web_scraping_collection" but this can be customized with the `--collection-name` option.
 4. Some models have token limits (e.g., 512 tokens). If your chunks exceed this limit, you may see warnings. Consider adjusting the CHUNK_SIZE setting to stay within your model's limits.
 5. For large datasets, the pipeline processes embeddings in batches (default size: 100) to manage memory usage efficiently.
+6. The pipeline includes automatic database connection handling with reconnection for long-running jobs that may exceed database connection timeouts.
