@@ -34,6 +34,10 @@ def main():
     pipeline_hierarchical = RAGPipeline(chunking_strategy="hierarchical")
     # pipeline_hierarchical.run(start_url, max_depth, page_limit)
     
+    print("\n4. Running with sitemap-based scraping:")
+    pipeline_sitemap = RAGPipeline(chunking_strategy="paragraph")
+    # pipeline_sitemap.run(start_url, max_depth, page_limit, use_sitemap=True)
+    
     print("\nPipeline execution completed!")
 
 if __name__ == "__main__":

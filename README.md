@@ -4,6 +4,7 @@ A web scraping pipeline that extracts content from websites, processes it for LL
 
 ## Features
 - Configurable web scraping with depth and page limits
+- Sitemap.xml support for efficient URL discovery
 - HTML to Markdown transformation
 - Multiple chunking strategies:
   - Paragraph-aware chunking (default): Preserves paragraph boundaries
@@ -88,6 +89,9 @@ python scraper.py --url "https://example.com" --depth 2 --page-limit 10 --chunki
 
 # Sentence-aware chunking
 python scraper.py --url "https://example.com" --depth 2 --page-limit 10 --chunking-strategy sentence
+
+# Using sitemap.xml for URL discovery (automatically tries common sitemap locations)
+python scraper.py --url "https://example.com" --depth 2 --page-limit 10 --use-sitemap
 ```
 
 ### Programmatic Usage
@@ -105,7 +109,30 @@ pipeline_first.run("https://example.com", max_depth=2, page_limit=10)
 # Hierarchical chunking (merged sections)
 pipeline_hierarchical = RAGPipeline(chunking_strategy="hierarchical")
 pipeline_hierarchical.run("https://example.com", max_depth=2, page_limit=10)
+
+# Using sitemap.xml for URL discovery
+pipeline_sitemap = RAGPipeline()
+pipeline_sitemap.run("https://example.com", max_depth=2, page_limit=10, use_sitemap=True)
 ```
+
+### Sitemap Support
+
+The scraper can optionally use `sitemap.xml` files for more efficient and comprehensive URL discovery. When the `--use-sitemap` flag is provided:
+
+1. The scraper automatically tries common sitemap locations:
+   - `/sitemap.xml`
+   - `/sitemap_index.xml`
+   - `/sitemap.txt`
+
+2. If a sitemap is found, it parses all URLs and scrapes them directly without crawling
+
+3. If no sitemap is found, it falls back to traditional crawling
+
+This approach is beneficial because:
+- Sitemaps often contain a complete list of pages the website owner wants indexed
+- It's more efficient than crawling, especially for large sites
+- It ensures you don't miss pages that aren't linked from other pages
+- It respects the website owner's intended site structure
 
 ### Example Scripts
 - `tests/test_pipeline.py`: Simple test with a sample website

@@ -26,7 +26,7 @@ class RAGPipeline:
         self.embedder = EmbeddingGenerator()
         self.vector_store = VectorStore()
 
-    def run(self, start_url: str, max_depth: int = None, page_limit: int = None) -> None:
+    def run(self, start_url: str, max_depth: int = None, page_limit: int = None, use_sitemap: bool = False) -> None:
         """
         Run the complete RAG pipeline.
         
@@ -34,6 +34,7 @@ class RAGPipeline:
             start_url: The starting URL to scrape
             max_depth: Maximum depth to crawl
             page_limit: Maximum number of pages to scrape
+            use_sitemap: Whether to use sitemap.xml for URL discovery
         """
         try:
             # Update scraper settings if provided
@@ -44,9 +45,11 @@ class RAGPipeline:
             
             logger.info(f"Starting web scraping for {start_url}")
             logger.info(f"Max depth: {self.scraper.max_depth}, Page limit: {self.scraper.page_limit}")
+            if use_sitemap:
+                logger.info("Using sitemap.xml for URL discovery")
             
             # 1. Scrape website
-            scraped_data = self.scraper.crawl(start_url)
+            scraped_data = self.scraper.crawl(start_url, use_sitemap=use_sitemap)
             logger.info(f"Scraped {len(scraped_data)} pages")
             
             if not scraped_data:
@@ -135,6 +138,8 @@ def main():
     parser.add_argument("--chunking-strategy", type=str, default="paragraph", 
                         choices=["paragraph", "first_section", "hierarchical", "sentence"],
                         help="Chunking strategy to use")
+    parser.add_argument("--use-sitemap", action="store_true", 
+                        help="Use sitemap.xml for URL discovery instead of traditional crawling")
     
     args = parser.parse_args()
     
@@ -145,7 +150,7 @@ def main():
         parser.error("Page limit must be positive")
     
     pipeline = RAGPipeline(chunking_strategy=args.chunking_strategy)
-    pipeline.run(args.url, args.depth, args.page_limit)
+    pipeline.run(args.url, args.depth, args.page_limit, args.use_sitemap)
 
 
 if __name__ == "__main__":
