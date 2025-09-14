@@ -255,7 +255,8 @@ class WebScraper:
             for sitemap_url in sitemap_urls:
                 try:
                     logger.info(f"Trying to use sitemap: {sitemap_url}")
-                    response = self.session.head(sitemap_url, timeout=10)
+                    # Use GET request instead of HEAD since some servers don't handle HEAD properly
+                    response = self.session.get(sitemap_url, timeout=10)
                     if response.status_code == 200:
                         return self.crawl_with_sitemap(sitemap_url)
                 except Exception as e:
