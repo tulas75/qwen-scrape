@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+"""
+Test script demonstrating the paragraph-aware chunking approach.
+"""
+
+import sys
+import os
+
+# Add src directory to path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
+
+from src.utils.chunker import TextChunker
+
+def test_paragraph_chunking():
+    """Test paragraph-aware chunking with markdown content."""
+    
+    # Create markdown content with clear paragraph structure
+    markdown_content = """This is the first paragraph. It's a short introduction to our topic. 
+This paragraph should be kept together as a single chunk since it's not too long.
+
+This is the second paragraph. It's also relatively short and should be preserved 
+as a separate chunk to maintain its semantic meaning.
+
+This is a much longer paragraph that contains significantly more content than the 
+previous paragraphs. It's so long that it will need to be split into multiple 
+chunks according to our chunking strategy. This is to demonstrate how the chunker 
+handles paragraphs that exceed the maximum chunk size limit while still trying to 
+preserve as much semantic meaning as possible. We want to see if the algorithm 
+correctly splits this large paragraph into smaller pieces with appropriate overlap. 
+This should help us evaluate the effectiveness of our approach to chunking.
+
+This is another short paragraph that should remain as its own chunk."""
+
+    chunker = TextChunker(chunk_size=150, chunk_overlap=20)
+    chunks = chunker.chunk_text(markdown_content)
+    
+    print("=== Paragraph-Aware Chunking Test ===")
+    print(f"Input text length: {len(markdown_content)} characters")
+    print(f"Number of paragraphs: {len([p for p in markdown_content.split('\n\n') if p.strip()])}")
+    print(f"Number of chunks: {len(chunks)}")
+    print("\nChunks:")
+    for i, chunk in enumerate(chunks):
+        print(f"\n--- Chunk {i+1} ---")
+        print(repr(chunk))
+        print(f"Length: {len(chunk)} characters")
+
+if __name__ == "__main__":
+    test_paragraph_chunking()

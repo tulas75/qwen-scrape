@@ -5,7 +5,7 @@ A web scraping pipeline that extracts content from websites, processes it for LL
 ## Features
 - Configurable web scraping with depth and page limits
 - HTML to Markdown transformation
-- Content chunking with overlap
+- Paragraph-aware content chunking with intelligent overlap handling
 - Vector embeddings generation using intfloat/multilingual-e5-large-instruct
 - PostgreSQL/pgvector storage with langchain_postgres and psycopg3
 

@@ -72,8 +72,10 @@ class RAGPipeline:
 
     def _chunk_scraped_data(self, scraped_data: List[Tuple[str, str]]) -> List[Tuple[str, str]]:
         """
-        Chunk scraped data.
-        Returns list of (markdown_chunk_content, source_url) tuples.
+        Chunk scraped data using paragraph-aware approach.
+        
+        Attempts to preserve paragraph boundaries when possible, only splitting paragraphs
+        that exceed the chunk size limit. Returns list of (markdown_chunk_content, source_url) tuples.
         """
         chunked_data = []
         for i, (content, url) in enumerate(scraped_data):
