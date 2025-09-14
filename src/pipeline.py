@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class RAGPipeline:
     def __init__(self):
         self.scraper = WebScraper()
-        self.chunker = TextChunker()
+        self.chunker = TextChunker(model_name=config.embedding_model)
         self.embedder = EmbeddingGenerator()
         self.vector_store = VectorStore()
 
