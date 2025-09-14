@@ -84,8 +84,21 @@ pipeline.run("https://example.com", max_depth=2, page_limit=10)
 ```
 
 ### Example Scripts
-- `example_usage.py`: Shows how to use the pipeline programmatically
-- `test_pipeline.py`: Simple test with a sample website
+- `tests/test_pipeline.py`: Simple test with a sample website
+- `tests/test_gnucoop.py`: Test with GNUcoop website that was returning 403
+- `tests/test_chunking.py`: Test for the chunking functionality
+- `tests/test_paragraph_chunking.py`: Test for paragraph-aware chunking
+- `tests/test_comprehensive_chunking.py`: Comprehensive test for various chunking scenarios
+- `tests/test_token_chunking.py`: Test demonstrating token-based vs character-based chunking
+
+To run the tests:
+```bash
+# Run a specific test
+python -m tests.test_pipeline
+
+# Run all tests
+python -m unittest discover -s tests
+```
 
 ## Project Structure
 ```
@@ -93,7 +106,6 @@ pipeline.run("https://example.com", max_depth=2, page_limit=10)
 ├── requirements.txt
 ├── scraper.py                # Main entry point
 ├── example_usage.py          # Example usage
-├── test_pipeline.py          # Test script
 └── src/
     ├── config/
     │   └── settings.py       # Configuration management
@@ -103,6 +115,13 @@ pipeline.run("https://example.com", max_depth=2, page_limit=10)
         ├── chunker.py        # Text chunking
         ├── embeddings.py     # Embedding generation
         └── vector_store.py   # Vector storage
+└── tests/                    # Test scripts
+    ├── test_pipeline.py
+    ├── test_gnucoop.py
+    ├── test_chunking.py
+    ├── test_paragraph_chunking.py
+    ├── test_comprehensive_chunking.py
+    └── test_token_chunking.py
 ```
 
 ## Configuration Options

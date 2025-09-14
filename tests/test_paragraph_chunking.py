@@ -7,7 +7,8 @@ import sys
 import os
 
 # Add src directory to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
+src_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'src')
+sys.path.insert(0, src_path)
 
 from src.utils.chunker import TextChunker
 
