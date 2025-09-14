@@ -92,6 +92,9 @@ python scraper.py --url "https://example.com" --depth 2 --page-limit 10 --chunki
 
 # Using sitemap.xml for URL discovery (automatically tries common sitemap locations)
 python scraper.py --url "https://example.com" --depth 2 --page-limit 10 --use-sitemap
+
+# Custom collection name in vector database
+python scraper.py --url "https://example.com" --depth 2 --page-limit 10 --collection-name my_custom_collection
 ```
 
 ### Programmatic Usage
@@ -113,6 +116,10 @@ pipeline_hierarchical.run("https://example.com", max_depth=2, page_limit=10)
 # Using sitemap.xml for URL discovery
 pipeline_sitemap = RAGPipeline()
 pipeline_sitemap.run("https://example.com", max_depth=2, page_limit=10, use_sitemap=True)
+
+# Custom collection name
+pipeline_custom = RAGPipeline(collection_name="my_custom_collection")
+pipeline_custom.run("https://example.com", max_depth=2, page_limit=10)
 ```
 
 ### Sitemap Support
@@ -192,6 +199,8 @@ python -m tests.test_new_settings
 | CHUNK_OVERLAP | 10 | Overlap between chunks in tokens |
 | EMBEDDING_MODEL | intfloat/multilingual-e5-large-instruct | Sentence transformer model for embeddings |
 
+*Note: The collection name in the vector database defaults to "web_scraping_collection" but can be customized using the `--collection-name` command-line option or the `collection_name` parameter when initializing RAGPipeline programmatically.*
+
 ## Chunking Strategies
 
 1. **Paragraph-aware chunking (default)**: Preserves natural paragraph boundaries when possible, only splitting paragraphs that exceed the chunk size limit.
@@ -206,5 +215,5 @@ python -m tests.test_new_settings
 
 1. The first time you run the pipeline, it will download the embedding model which may take some time.
 2. Make sure your PostgreSQL database has the pgvector extension enabled.
-3. The pipeline will create a collection named "web_scraping_collection" in your database.
+3. The pipeline will create a collection in your database. By default, it uses "web_scraping_collection" but this can be customized with the `--collection-name` option.
 4. Some models have token limits (e.g., 512 tokens). If your chunks exceed this limit, you may see warnings. Consider adjusting the CHUNK_SIZE setting to stay within your model's limits.

@@ -14,17 +14,18 @@ logger = logging.getLogger(__name__)
 
 
 class RAGPipeline:
-    def __init__(self, chunking_strategy: str = "paragraph"):
+    def __init__(self, chunking_strategy: str = "paragraph", collection_name: str = "web_scraping_collection"):
         """
         Initialize the RAG pipeline.
         
         Args:
             chunking_strategy: Strategy for chunking - "paragraph", "first_section", "hierarchical", or "sentence"
+            collection_name: Name of the collection in the vector store
         """
         self.scraper = WebScraper()
         self.chunker = TextChunker(model_name=config.embedding_model, strategy=chunking_strategy)
         self.embedder = EmbeddingGenerator()
-        self.vector_store = VectorStore()
+        self.vector_store = VectorStore(collection_name=collection_name)
 
     def run(self, start_url: str, max_depth: int = None, page_limit: int = None, use_sitemap: bool = False) -> None:
         """
@@ -140,6 +141,8 @@ def main():
                         help="Chunking strategy to use")
     parser.add_argument("--use-sitemap", action="store_true", 
                         help="Use sitemap.xml for URL discovery instead of traditional crawling")
+    parser.add_argument("--collection-name", type=str, default="web_scraping_collection",
+                        help="Name of the collection in the vector store")
     
     args = parser.parse_args()
     
@@ -149,7 +152,7 @@ def main():
     if args.page_limit <= 0:
         parser.error("Page limit must be positive")
     
-    pipeline = RAGPipeline(chunking_strategy=args.chunking_strategy)
+    pipeline = RAGPipeline(chunking_strategy=args.chunking_strategy, collection_name=args.collection_name)
     pipeline.run(args.url, args.depth, args.page_limit, args.use_sitemap)
 
 
