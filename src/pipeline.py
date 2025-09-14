@@ -14,9 +14,15 @@ logger = logging.getLogger(__name__)
 
 
 class RAGPipeline:
-    def __init__(self):
+    def __init__(self, chunking_strategy: str = "paragraph"):
+        """
+        Initialize the RAG pipeline.
+        
+        Args:
+            chunking_strategy: Strategy for chunking - "paragraph", "first_section", "hierarchical", or "sentence"
+        """
         self.scraper = WebScraper()
-        self.chunker = TextChunker(model_name=config.embedding_model)
+        self.chunker = TextChunker(model_name=config.embedding_model, strategy=chunking_strategy)
         self.embedder = EmbeddingGenerator()
         self.vector_store = VectorStore()
 
@@ -126,6 +132,9 @@ def main():
     parser.add_argument("--url", required=True, help="Starting URL to scrape")
     parser.add_argument("--depth", type=int, default=config.max_depth, help="Maximum crawling depth")
     parser.add_argument("--page-limit", type=int, default=config.page_limit, help="Maximum number of pages to scrape")
+    parser.add_argument("--chunking-strategy", type=str, default="paragraph", 
+                        choices=["paragraph", "first_section", "hierarchical", "sentence"],
+                        help="Chunking strategy to use")
     
     args = parser.parse_args()
     
@@ -135,7 +144,7 @@ def main():
     if args.page_limit <= 0:
         parser.error("Page limit must be positive")
     
-    pipeline = RAGPipeline()
+    pipeline = RAGPipeline(chunking_strategy=args.chunking_strategy)
     pipeline.run(args.url, args.depth, args.page_limit)
 
 

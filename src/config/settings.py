@@ -20,8 +20,8 @@ class Config:
     embedding_model: str = os.getenv("EMBEDDING_MODEL", "intfloat/multilingual-e5-large-instruct")
     
     # Processing settings
-    chunk_size: int = int(os.getenv("CHUNK_SIZE", "500"))
-    chunk_overlap: int = int(os.getenv("CHUNK_OVERLAP", "50"))
+    chunk_size: int = int(os.getenv("CHUNK_SIZE", "250"))
+    chunk_overlap: int = int(os.getenv("CHUNK_OVERLAP", "10"))
 
 
 # Global config instance
