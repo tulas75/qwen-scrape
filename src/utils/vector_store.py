@@ -26,6 +26,40 @@ class VectorStore:
         self.vector_store = None
         self._initialize_store()
 
+    def _get_source_name(self, url: str) -> str:
+        """
+        Generate a descriptive source name based on the domain of the URL.
+        
+        Args:
+            url: The URL to extract domain from
+            
+        Returns:
+            A descriptive source name like "Gnucoop Website" or "Domain Website"
+        """
+        from urllib.parse import urlparse
+        
+        try:
+            parsed_url = urlparse(url)
+            domain = parsed_url.netloc
+            
+            # Remove 'www.' prefix if present
+            if domain.startswith('www.'):
+                domain = domain[4:]
+                
+            # Extract the main domain name (first part before any dots)
+            domain_parts = domain.split('.')
+            if len(domain_parts) >= 2:
+                # Take the second level domain (e.g., 'gnucoop' from 'gnucoop.com')
+                domain_name = domain_parts[-2].capitalize()
+            else:
+                # If only one part, use it directly
+                domain_name = domain_parts[0].capitalize()
+            
+            return f'{domain_name} Website'
+        except Exception:
+            # Fallback to URL if parsing fails
+            return url
+
     def _initialize_store(self):
         """Initialize the PGVector store."""
         try:
@@ -62,7 +96,7 @@ class VectorStore:
                     "id": "",  # Will be populated by the database
                     "url": source_url,  # The URL of the chunk
                     "text": content,  # The Markdown content of the chunk
-                    "source": source_url,  # The source (URL) - for consistency with image structure
+                    "source": self._get_source_name(source_url),  # A descriptive source name based on domain
                     "mimetype": "text/markdown"  # MIME type for Markdown content
                 } 
                 for content, source_url, _ in documents
