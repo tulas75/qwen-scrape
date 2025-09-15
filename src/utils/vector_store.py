@@ -22,8 +22,8 @@ class DummyEmbeddings(Embeddings):
 
 
 class VectorStore:
-    def __init__(self, connection_string: str = None, collection_name: str = "web_scraping_collection"):
-        self.connection_string = connection_string or config.database_url
+    def __init__(self, connection: str = None, collection_name: str = "web_scraping_collection"):
+        self.connection = connection or config.database_url
         self.collection_name = collection_name
         self.vector_store = None
         self._initialize_store()
@@ -80,7 +80,7 @@ class VectorStore:
             
             self.vector_store = PGVector(
                 embeddings=dummy_embeddings,
-                connection=self.connection_string,
+                connection=self.connection,
                 collection_name=self.collection_name,
                 engine_args=engine_args,
             )
