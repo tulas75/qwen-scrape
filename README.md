@@ -67,7 +67,7 @@ A web scraping pipeline that extracts content from websites, processes it for LL
 Set up your database connection and other settings using environment variables:
 
 ```bash
-export DATABASE_URL="postgresql://user:password@localhost:5432/rag_db"
+export DATABASE_URL="postgresql+psycopg://user:password@localhost:5432/rag_db"
 export MAX_DEPTH=2
 export PAGE_LIMIT=10
 export CHUNK_SIZE=500
